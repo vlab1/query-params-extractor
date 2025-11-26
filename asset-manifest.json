@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/query-params-extractor/static/css/main.e6c13ad2.css",
+    "main.js": "/query-params-extractor/static/js/main.9f88469a.js",
+    "static/js/453.0fc7dcb0.chunk.js": "/query-params-extractor/static/js/453.0fc7dcb0.chunk.js",
+    "index.html": "/query-params-extractor/index.html",
+    "main.e6c13ad2.css.map": "/query-params-extractor/static/css/main.e6c13ad2.css.map",
+    "main.9f88469a.js.map": "/query-params-extractor/static/js/main.9f88469a.js.map",
+    "453.0fc7dcb0.chunk.js.map": "/query-params-extractor/static/js/453.0fc7dcb0.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.9f88469a.js"
+  ]
+}
