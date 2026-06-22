@@ -3,6 +3,17 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs'
 
 const STORAGE_KEY = 'qp_history'
 const TRUNCATE_LENGTH = 80
+
+function useIsMobile() {
+	const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 600)
+	useEffect(() => {
+		const mq = window.matchMedia('(max-width: 600px)')
+		const handler = (e) => setIsMobile(e.matches)
+		mq.addEventListener('change', handler)
+		return () => mq.removeEventListener('change', handler)
+	}, [])
+	return isMobile
+}
 // ─── helpers ────────────────────────────────────────────────────────────────
 
 function getHistory() {
@@ -180,13 +191,28 @@ function ValueCell({ value, dimmed = false, highlight = false }) {
 // ─── HistoryView ─────────────────────────────────────────────────────────────
 
 function HistoryView({ current, onClose }) {
+	const isMobile = useIsMobile()
 	const history = useMemo(() => getHistory(), [])
 	const prevEntries = history.slice(0, -1)
 
+	const overlayStyle = { ...styles.overlay, ...(isMobile ? { alignItems: 'flex-end' } : {}) }
+	const cardStyle = {
+		...styles.historyCard,
+		...(isMobile ? {
+			width: '100%', maxWidth: '100%', maxHeight: '90vh',
+			borderRadius: '20px 20px 0 0', padding: '20px 16px',
+		} : {}),
+	}
+	const itemStyle = (rowStyle) => ({
+		...styles.historyItem,
+		...rowStyle,
+		...(isMobile ? { gridTemplateColumns: '90px 16px 1fr', fontSize: '13px' } : {}),
+	})
+
 	if (prevEntries.length === 0) {
 		return (
-			<div style={styles.overlay} onClick={onClose}>
-				<div style={styles.historyCard} className="history-card" onClick={(e) => e.stopPropagation()}>
+			<div style={overlayStyle}>
+				<div style={cardStyle}>
 					<div style={styles.historyHeader}>
 						<h2 style={styles.historyTitle}>Previous values</h2>
 						<button style={styles.closeBtn} onClick={onClose}>✕</button>
@@ -201,8 +227,8 @@ function HistoryView({ current, onClose }) {
 	const allKeys = new Set([...Object.keys(prev), ...Object.keys(current)])
 
 	return (
-		<div style={styles.overlay} className="overlay-wrap">
-			<div style={styles.historyCard} className="history-card">
+		<div style={overlayStyle}>
+			<div style={cardStyle}>
 				<div style={styles.historyHeader}>
 					<h2 style={styles.historyTitle}>Previous values</h2>
 					<button style={styles.closeBtn} onClick={onClose}>✕</button>
@@ -224,7 +250,7 @@ function HistoryView({ current, onClose }) {
 						else if (isNew) rowStyle = styles.rowNew
 						else if (isRemoved) rowStyle = styles.rowRemoved
 						return (
-							<li key={key} style={{ ...styles.historyItem, ...rowStyle }} className="history-item">
+							<li key={key} style={itemStyle(rowStyle)}>
 								<span style={styles.key}>{key}</span>
 								<span style={styles.separator}>→</span>
 								<span style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0, flex: 1 }}>
@@ -262,6 +288,7 @@ function toDisplay(raw) {
 }
 
 function FpjsRow({ name, v }) {
+	const isMobile = useIsMobile()
 	const [expanded, setExpanded] = useState(false)
 	const [copied, setCopied] = useState(false)
 
@@ -286,7 +313,7 @@ function FpjsRow({ name, v }) {
 
 	return (
 		<li style={styles.fpRow}>
-			<span style={styles.fpKey} className="fp-key">{name}</span>
+			<span style={{ ...styles.fpKey, ...(isMobile ? { minWidth: '100px', fontSize: '11px' } : {}) }}>{name}</span>
 			<span style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0, flex: 1 }}>
 				{isUnavailable ? (
 					<em style={{ opacity: 0.3, fontSize: '12px' }}>{unavailableLabel}</em>
@@ -326,6 +353,7 @@ const TABS = [
 ]
 
 function FingerprintModal({ onClose }) {
+	const isMobile = useIsMobile()
 	const [data, setData] = useState(null)
 	const [fpjsResult, setFpjsResult] = useState(null)
 	const [tab, setTab] = useState('basic')
@@ -356,9 +384,18 @@ function FingerprintModal({ onClose }) {
 		})
 	}
 
+	const fpOverlayStyle = { ...styles.overlay, ...(isMobile ? { alignItems: 'flex-end' } : {}) }
+	const fpCardStyle = {
+		...styles.fpCard,
+		...(isMobile ? {
+			width: '100%', maxWidth: '100%', maxHeight: '92vh',
+			borderRadius: '20px 20px 0 0', padding: '20px 16px',
+		} : {}),
+	}
+
 	return (
-		<div style={styles.overlay} className="overlay-wrap">
-			<div style={styles.fpCard} className="fp-card">
+		<div style={fpOverlayStyle}>
+			<div style={fpCardStyle}>
 				{/* Header */}
 				<div style={styles.fpHeader}>
 					<div style={styles.fpEyebrow}>🔍 Browser Fingerprint</div>
@@ -366,13 +403,13 @@ function FingerprintModal({ onClose }) {
 				</div>
 
 				{/* Tabs */}
-				<div style={styles.tabs} className="tabs">
+				<div style={{ ...styles.tabs, ...(isMobile ? { gap: '6px' } : {}) }}>
 					{TABS.map((t) => (
 						<button
 							key={t.id}
-							className="tab"
 							style={{
 								...styles.tab,
+								...(isMobile ? { padding: '5px 8px', fontSize: '11px' } : {}),
 								...(tab === t.id ? { ...styles.tabActive, borderColor: t.color, color: t.color } : {}),
 							}}
 							onClick={() => setTab(t.id)}
@@ -387,7 +424,7 @@ function FingerprintModal({ onClose }) {
 					fpjsResult ? (
 						<div style={{ ...styles.hashBanner, borderColor: activeColor }}>
 							<span style={styles.hashLabel}>visitorId</span>
-							<span style={{ ...styles.hashValue, color: activeColor }} className="hash-value">{fpjsResult.visitorId}</span>
+							<span style={{ ...styles.hashValue, color: activeColor }}>{fpjsResult.visitorId}</span>
 							<button style={{ ...styles.copyHashBtn, borderColor: activeColor, color: activeColor }}
 								onClick={() => navigator.clipboard.writeText(fpjsResult.visitorId).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1500) })}>
 								{copied ? 'copied!' : 'copy'}
@@ -399,7 +436,7 @@ function FingerprintModal({ onClose }) {
 				) : activeData ? (
 					<div style={{ ...styles.hashBanner, borderColor: activeColor }}>
 						<span style={styles.hashLabel}>SHA-256</span>
-						<span style={{ ...styles.hashValue, color: activeColor }} className="hash-value">{activeData.hash}</span>
+						<span style={{ ...styles.hashValue, color: activeColor }}>{activeData.hash}</span>
 						<button style={{ ...styles.copyHashBtn, borderColor: activeColor, color: activeColor }} onClick={handleCopyHash}>
 							{copied ? 'copied!' : 'copy'}
 						</button>
@@ -437,6 +474,7 @@ function FingerprintModal({ onClose }) {
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 function App() {
+	const isMobile = useIsMobile()
 	const [showHistory, setShowHistory] = useState(false)
 	const [showFingerprint, setShowFingerprint] = useState(false)
 
@@ -451,14 +489,28 @@ function App() {
 
 	const hasHistory = useMemo(() => getHistory().length > 1, [])
 
+	const cardStyle = {
+		...styles.card,
+		...(isMobile ? { padding: '20px 16px', width: '100%', borderRadius: '12px' } : {}),
+	}
+
+	const itemStyle = {
+		...styles.item,
+		...(isMobile ? { gridTemplateColumns: 'minmax(50px, max-content) 14px 1fr', fontSize: '14px', gap: '0 2px' } : {}),
+	}
+
 	return (
-		<div style={styles.container}>
-			<button style={styles.fpTriggerBtn} className="fp-trigger-btn" onClick={() => setShowFingerprint(true)} title="Browser Fingerprint">
+		<div style={{ ...styles.container, ...(isMobile ? { alignItems: 'flex-start', padding: '16px 0' } : {}) }}>
+			<button
+				style={{ ...styles.fpTriggerBtn, ...(isMobile ? { top: '10px', right: '10px', width: '36px', height: '36px', fontSize: '16px' } : {}) }}
+				onClick={() => setShowFingerprint(true)}
+				title="Browser Fingerprint"
+			>
 				🔍
 			</button>
-			<div style={styles.card} className="card">
+			<div style={cardStyle}>
 				<div style={styles.titleRow}>
-					<h1 style={styles.title} className="title">Query Parameters</h1>
+					<h1 style={{ ...styles.title, ...(isMobile ? { fontSize: '18px' } : {}) }}>Query Parameters</h1>
 					{hasHistory && (
 						<button style={styles.historyBtn} onClick={() => setShowHistory(true)}>
 							View history
@@ -471,7 +523,7 @@ function App() {
 				) : (
 					<ul style={styles.list}>
 						{Object.entries(queryParams).map(([key, value]) => (
-							<li key={key} style={styles.item} className="item">
+							<li key={key} style={itemStyle}>
 								<span style={styles.key}>{key}</span>
 								<span style={styles.separator}>→</span>
 								<ValueCell value={value} />
