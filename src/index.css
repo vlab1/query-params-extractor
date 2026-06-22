@@ -22,6 +22,72 @@
   background: #3a3a3a;
 }
 
+@media (max-width: 600px) {
+  .overlay-wrap {
+    align-items: flex-end !important;
+  }
+
+
+  .card {
+    padding: 20px 16px !important;
+    border-radius: 12px !important;
+    width: 100% !important;
+  }
+
+  .title {
+    font-size: 18px !important;
+  }
+
+  .item {
+    grid-template-columns: minmax(60px, max-content) 16px 1fr !important;
+    font-size: 14px !important;
+  }
+
+  .history-card,
+  .fp-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 90vh !important;
+    border-radius: 16px 16px 0 0 !important;
+    padding: 20px 16px !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+  }
+
+  .history-item {
+    grid-template-columns: 100px 16px 1fr !important;
+    font-size: 13px !important;
+  }
+
+  .tabs {
+    gap: 6px !important;
+  }
+
+  .tab {
+    padding: 5px 8px !important;
+    font-size: 11px !important;
+  }
+
+  .fp-key {
+    min-width: 110px !important;
+    font-size: 11px !important;
+  }
+
+  .fp-trigger-btn {
+    top: 10px !important;
+    right: 10px !important;
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 16px !important;
+  }
+
+  .hash-value {
+    font-size: 10px !important;
+  }
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
