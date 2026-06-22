@@ -75,7 +75,7 @@ async function collectFingerprint() {
 		}
 	}
 	const canvasData = { canvasFp, webglVendor, webglRenderer }
-	const canvasHash = await sha256(JSON.stringify({ ...basic, ...canvasData }))
+	const canvasHash = await sha256(JSON.stringify(canvasData))
 
 	// ── Variant 3: audio + fonts ─────────────────────────────────────────────
 	let audioHash = 'n/a'
@@ -128,7 +128,7 @@ async function collectFingerprint() {
 	document.body.removeChild(testEl)
 
 	const advancedData = { audioFingerprint: audioHash, availableFonts }
-	const advancedHash = await sha256(JSON.stringify({ ...basic, ...canvasData, ...advancedData }))
+	const advancedHash = await sha256(JSON.stringify(advancedData))
 
 	return {
 		basic: { data: basic, hash: basicHash },
